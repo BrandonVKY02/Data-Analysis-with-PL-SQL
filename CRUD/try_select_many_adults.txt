@@ -1,0 +1,11 @@
+-- Prompt the user for the column name
+ACCEPT p_column CHAR PROMPT 'Enter the column name: '
+
+-- Prompt the user for the value to search for
+ACCEPT p_value CHAR PROMPT 'Enter the value to search for: '
+
+-- Execute the procedure with the user inputs
+BEGIN
+    select_many_adults('&p_column', '&p_value');
+END;
+/

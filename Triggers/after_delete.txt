@@ -1,0 +1,8 @@
+CREATE OR REPLACE TRIGGER after_delete_adult
+AFTER DELETE ON adult
+FOR EACH ROW
+BEGIN
+    -- Log the deletion to a separate table
+    INSERT INTO audit_log (action, table_name, record_id, action_time, details)
+    VALUES ('DELETE', 'ADULT', :old.id, SYSDATE, 'Record deleted: Age=' || :old.age || ', Workclass=' || :old.workclass || ', Education=' || :old.education);
+END;

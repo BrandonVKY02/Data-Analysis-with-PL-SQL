@@ -1,0 +1,209 @@
+-- Get the ID of the record to update
+ACCEPT id NUMBER PROMPT 'Enter ID to update the value: '
+
+ACCEPT new_age PROMPT 'Enter new age (or press Enter to keep the current value): '
+ACCEPT new_workclass PROMPT 'Enter new workclass (or press Enter to keep the current value): '
+ACCEPT new_fntwgt PROMPT 'Enter new fntwgt (or press Enter to keep the current value): '
+ACCEPT new_education PROMPT 'Enter new education level (or press Enter to keep the current value): '
+ACCEPT new_education_num PROMPT 'Enter new years of education (or press Enter to keep the current value): '
+ACCEPT new_marital_status PROMPT 'Enter new marital status (1 for Divorced, 2 for Married, 3 for Never Married, 4 for Seperated, 5 for Widowed) (or press Enter to keep the current value): '
+ACCEPT new_occupation PROMPT 'Enter new occupation  (or press Enter to keep the current value): '
+ACCEPT new_relationship PROMPT 'Enter new relationship (1 for Husband, 2 for Wife, 3 for Other Relative, 4 for Unmarried) (or press Enter to keep the current value): '
+ACCEPT new_race PROMPT 'Enter new race (or press Enter to keep the current value): '
+ACCEPT new_sex PROMPT 'Enter new sex (1 for Male, 2 for Female) (or press Enter to keep the current value): '
+ACCEPT new_capital_gain PROMPT 'Enter new capital gain (or press Enter to keep the current value): '
+ACCEPT new_capital_loss PROMPT 'Enter new capital loss (or press Enter to keep the current value): '
+ACCEPT new_hours_per_week PROMPT 'Enter new working hours per week (or press Enter to keep the current value): '
+ACCEPT new_native_country PROMPT 'Enter new country (or press Enter to keep the current value): '
+ACCEPT new_income PROMPT 'Enter new income range (1 for <=50k, 2 for >50k) (or press Enter to keep the current value): '
+
+DECLARE
+    v_id              		adult.id%TYPE := &id;
+    v_age             		adult.age%TYPE;
+    v_workclass       		adult.workclass%TYPE;
+    v_fntwgt          		adult.fntwgt%TYPE;
+    v_education       		adult.education%TYPE;
+    v_education_num   		adult.education_num%TYPE;
+    v_marital_status  		adult.marital_status%TYPE;
+    v_occupation      		adult.occupation%TYPE;
+    v_relationship    		adult.relationship%TYPE;
+    v_race            		adult.race%TYPE;
+    v_sex             		adult.sex%TYPE;
+    v_capital_gain    		adult.capital_gain%TYPE;
+    v_capital_loss    		adult.capital_loss%TYPE;
+    v_hours_per_week  		adult.hours_per_week%TYPE;
+    v_native_country  		adult.native_country%TYPE;
+    v_income          		adult.income%TYPE;
+    v_new_age         		adult.age%TYPE;
+    v_new_workclass   		adult.workclass%TYPE;
+    v_new_fntwgt      		adult.fntwgt%TYPE;
+    v_new_education   		adult.education%TYPE;
+    v_new_education_num 	adult.education_num%TYPE;
+    v_new_marital_status 	adult.marital_status%TYPE;
+    v_new_occupation 		adult.occupation%TYPE;
+    v_new_relationship 		adult.relationship%TYPE;
+    v_new_race 			adult.race%TYPE;
+    v_new_sex 			adult.sex%TYPE;
+    v_new_capital_gain 		adult.capital_gain%TYPE;
+    v_new_capital_loss 		adult.capital_loss%TYPE;
+    v_new_hours_per_week 	adult.hours_per_week%TYPE;
+    v_new_native_country 	adult.native_country%TYPE;
+    v_new_income 		adult.income%TYPE; 
+    sex_choice 			VARCHAR2(30);
+    income_choice 		VARCHAR2(30);
+    relationship_choice 	VARCHAR2(30);
+    marital_status_choice 	VARCHAR2(30);  
+BEGIN
+    -- Fetch the existing record
+    select_one_adult
+	(v_id, v_age, v_workclass, v_fntwgt, v_education, v_education_num, v_marital_status, v_occupation, 
+	 v_relationship, v_race, v_sex, v_capital_gain, v_capital_loss, v_hours_per_week, v_native_country, v_income);
+
+    -- Assign the new value or keep the old one
+    -- age
+    IF '&new_age' IS NOT NULL THEN
+        v_new_age := TO_NUMBER('&new_age');
+    ELSE
+        v_new_age := v_age;
+    END IF;
+
+    -- workclass
+    IF '&new_workclass' IS NOT NULL THEN
+        v_new_workclass := '&new_workclass';
+    ELSE
+        v_new_workclass := v_workclass;
+    END IF;
+
+    -- fntwgt
+    IF '&new_fntwgt' IS NOT NULL THEN
+        v_new_fntwgt := '&new_fntwgt';
+    ELSE
+        v_new_fntwgt := v_fntwgt;
+    END IF;
+
+    -- education
+    IF '&new_education' IS NOT NULL THEN
+        v_new_education := '&new_education';
+    ELSE
+        v_new_education := v_education;
+    END IF;
+
+    -- education_num
+    IF '&new_education_num' IS NOT NULL THEN
+        v_new_education_num := TO_NUMBER('&new_education_num');
+    ELSE
+        v_new_education_num := v_education_num;
+    END IF;
+
+    -- marital_status
+    IF '&new_marital_status' IS NOT NULL THEN
+	marital_status_choice := TO_NUMBER('&new_marital_status');
+        v_new_marital_status := CASE marital_status_choice
+                WHEN 1 THEN 'Divorced'
+                WHEN 2 THEN 'Married'
+                WHEN 3 THEN 'Never-married'
+                WHEN 4 THEN 'Seperated'
+		WHEN 5 THEN 'Widowed'
+                ELSE NULL
+             END;
+    ELSE
+        v_new_marital_status := v_marital_status;
+    END IF;
+
+    -- occupation
+    IF '&new_occupation' IS NOT NULL THEN
+        v_new_occupation := '&new_occupation';
+    ELSE
+        v_new_occupation := v_occupation;
+    END IF;
+
+    -- relationship
+    IF '&new_relationship' IS NOT NULL THEN
+	relationship_choice := TO_NUMBER('&new_relationship');
+    	v_new_relationship := CASE relationship_choice
+                WHEN 1 THEN 'Husband'
+                WHEN 2 THEN 'Wife'
+                WHEN 3 THEN 'Other-relative'
+                WHEN 4 THEN 'Unmarried'
+                ELSE NULL
+             END;
+    ELSE
+        v_new_relationship := v_relationship;
+    END IF;
+
+    -- race
+    IF '&new_race' IS NOT NULL THEN
+        v_new_race := '&new_race';
+    ELSE
+        v_new_race := v_race;
+    END IF;
+
+    -- sex
+    IF '&new_sex' IS NOT NULL THEN
+	sex_choice := TO_NUMBER('&new_sex');
+	v_new_sex := CASE sex_choice
+                WHEN 1 THEN 'Male'
+                WHEN 2 THEN 'Female'
+                ELSE NULL
+             END;
+    ELSE
+        v_new_sex := v_sex;
+    END IF;
+
+    -- capital_gain
+    IF '&new_capital_gain' IS NOT NULL THEN
+        v_new_capital_gain := TO_NUMBER('&new_capital_gain');
+    ELSE
+        v_new_capital_gain := v_capital_gain;
+    END IF;
+
+    -- capital_loss
+    IF '&new_capital_loss' IS NOT NULL THEN
+        v_new_capital_loss := TO_NUMBER('&new_capital_loss');
+    ELSE
+        v_new_capital_loss := v_capital_loss;
+    END IF;
+
+    -- hours_per_week
+    IF '&new_hours_per_week' IS NOT NULL THEN
+        v_new_hours_per_week := TO_NUMBER('&new_hours_per_week');
+    ELSE
+        v_new_hours_per_week := v_hours_per_week;
+    END IF;
+
+    -- native_country
+    IF '&new_native_country' IS NOT NULL THEN
+        v_new_native_country := '&new_native_country';
+    ELSE
+        v_new_native_country := v_native_country;
+    END IF;
+
+    -- income
+    IF '&new_income' IS NOT NULL THEN
+	income_choice := TO_NUMBER('&new_income');
+    	v_new_income := CASE income_choice
+                	WHEN 1 THEN '<=50K'
+               	 	WHEN 2 THEN '>50K'
+                	ELSE NULL
+             	END;
+    ELSE
+        v_new_income := v_income;
+    END IF;
+
+    -- Perform update
+    IF v_new_sex IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for sex.');
+    ELSIF v_new_income IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for income.');
+    ELSIF v_new_relationship IS NULL THEN
+	DBMS_OUTPUT.PUT_LINE('Invalid choice for relationship.');
+    ELSIF v_new_marital_status IS NULL THEN
+	DBMS_OUTPUT.PUT_LINE('Invalid choice for marital status.');
+    ELSE
+	update_adult(v_id, v_new_age, v_new_workclass, v_new_fntwgt, v_new_education, v_new_education_num, 
+		     v_new_marital_status, v_new_occupation, v_new_relationship, v_new_race, v_new_sex, v_new_capital_gain, 
+                     v_new_capital_loss, v_new_hours_per_week, v_new_native_country, v_new_income);
+    END IF;
+END;
+/
+

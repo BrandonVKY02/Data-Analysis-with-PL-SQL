@@ -1,0 +1,56 @@
+CREATE OR REPLACE PROCEDURE update_adult (
+    p_id IN adult.id%TYPE,
+    p_age IN adult.age%TYPE,
+    p_workclass IN adult.workclass%TYPE,
+    p_fntwgt IN adult.fntwgt%TYPE,
+    p_education IN adult.education%TYPE,
+    p_education_num IN adult.education_num%TYPE,
+    p_marital_status IN adult.marital_status%TYPE,
+    p_occupation IN adult.occupation%TYPE,
+    p_relationship IN adult.relationship%TYPE,
+    p_race IN adult.race%TYPE,
+    p_sex IN adult.sex%TYPE,
+    p_capital_gain IN adult.capital_gain%TYPE,
+    p_capital_loss IN adult.capital_loss%TYPE,
+    p_hours_per_week IN adult.hours_per_week%TYPE,
+    p_native_country IN adult.native_country%TYPE,
+    p_income IN adult.income%TYPE
+) IS
+    -- Declare a savepoint name
+    savepoint_name VARCHAR2(30) := 'sp_before_update';
+BEGIN
+    -- Create a savepoint before the update operation
+    SAVEPOINT savepoint_name;
+
+    -- Perform the update operation
+    UPDATE adult
+    SET age = p_age,
+        workclass = p_workclass,
+        fntwgt = p_fntwgt,
+        education = p_education,
+        education_num = p_education_num,
+        marital_status = p_marital_status,
+        occupation = p_occupation,
+        relationship = p_relationship,
+        race = p_race,
+        sex = p_sex,
+        capital_gain = p_capital_gain,
+        capital_loss = p_capital_loss,
+        hours_per_week = p_hours_per_week,
+        native_country = p_native_country,
+        income = p_income
+    WHERE id = p_id;
+
+    -- Commit the transaction if the update is successful
+    COMMIT;
+    
+    -- Print a success message
+    DBMS_OUTPUT.PUT_LINE('Adult with ID ' || p_id || ' was updated successfully.');
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Rollback to the savepoint if an error occurs
+        ROLLBACK TO savepoint_name;
+        -- Print an error message
+        DBMS_OUTPUT.PUT_LINE('An error occurred while updating the record: ' || SQLERRM);
+END;
+/

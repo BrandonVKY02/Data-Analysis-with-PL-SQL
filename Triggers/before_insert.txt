@@ -1,0 +1,31 @@
+CREATE OR REPLACE TRIGGER before_insert_adult
+BEFORE INSERT ON adult
+FOR EACH ROW
+BEGIN
+    -- Validate age (e.g., must be between 18 and 100)
+    IF :new.age < 18 OR :new.age > 100 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Age must be between 18 and 100.');
+    END IF;
+
+    -- Validate workclass (e.g., must not be NULL)
+    IF :new.workclass IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Workclass must not be NULL.');
+    END IF;
+
+    -- Validate education_num (e.g., must be between 1 and 16)
+    IF :new.education_num < 1 OR :new.education_num > 16 THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Education number must be between 1 and 16.');
+    END IF;
+
+    -- Validate hours_per_week (e.g., must be between 1 and 99)
+    IF :new.hours_per_week < 1 OR :new.hours_per_week > 99 THEN
+        RAISE_APPLICATION_ERROR(-20004, 'Hours per week must be between 1 and 99.');
+    END IF;
+
+    -- Validate income (e.g., must be either '<=50K' or '>50K')
+    IF :new.income NOT IN ('<=50K', '>50K') THEN
+        RAISE_APPLICATION_ERROR(-20005, 'Income must be either "<=50K" or ">50K".');
+    END IF;
+    
+    -- Additional validations can be added here as required
+END;

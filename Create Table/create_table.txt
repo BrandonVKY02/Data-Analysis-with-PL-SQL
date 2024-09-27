@@ -1,0 +1,42 @@
+DROP TABLE adult CASCADE CONSTRAINTS;
+
+CREATE TABLE adult (
+    id NUMBER(10),
+    age NUMBER(3),
+    workclass VARCHAR2(30),
+    fntwgt NUMBER(10),
+    education VARCHAR2(30),
+    education_num NUMBER(3),
+    marital_status VARCHAR2(30),
+    occupation VARCHAR2(30),
+    relationship VARCHAR2(30),
+    race VARCHAR2(30),
+    sex VARCHAR2(30),
+    capital_gain NUMBER(10),
+    capital_loss NUMBER(10),
+    hours_per_week NUMBER(3),
+    native_country VARCHAR2(30),
+    income VARCHAR2(30),
+    CONSTRAINT adult_id_pk PRIMARY KEY (id)
+);
+
+DROP SEQUENCE adult_seq;
+
+CREATE SEQUENCE adult_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE OR REPLACE TRIGGER adult_before_insert
+BEFORE INSERT ON adult
+FOR EACH ROW
+BEGIN
+    :new.id := adult_seq.NEXTVAL;
+END;
+/
+
+CREATE OR REPLACE DIRECTORY my_directory AS 'D:\Test';
+
+GRANT READ, WRITE ON DIRECTORY my_directory TO fes;
+

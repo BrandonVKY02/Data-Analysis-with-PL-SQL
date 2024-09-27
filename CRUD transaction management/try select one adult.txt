@@ -1,0 +1,76 @@
+-- Get the ID of the record to update
+ACCEPT id NUMBER PROMPT 'Enter ID to retrieve the record: '
+
+DECLARE
+    v_id              		adult.id%TYPE := &id;
+    v_age             		adult.age%TYPE;
+    v_workclass       		adult.workclass%TYPE;
+    v_fntwgt          		adult.fntwgt%TYPE;
+    v_education       		adult.education%TYPE;
+    v_education_num   		adult.education_num%TYPE;
+    v_marital_status  		adult.marital_status%TYPE;
+    v_occupation      		adult.occupation%TYPE;
+    v_relationship    		adult.relationship%TYPE;
+    v_race            		adult.race%TYPE;
+    v_sex             		adult.sex%TYPE;
+    v_capital_gain    		adult.capital_gain%TYPE;
+    v_capital_loss    		adult.capital_loss%TYPE;
+    v_hours_per_week  		adult.hours_per_week%TYPE;
+    v_native_country  		adult.native_country%TYPE;
+    v_income          		adult.income%TYPE;
+BEGIN
+    -- Set a savepoint before retrieving the record
+    SAVEPOINT sp_before_select;
+    
+    -- Fetch the existing record
+    select_one_adult(
+        p_id => v_id,
+        p_age => v_age,
+        p_workclass => v_workclass,
+        p_fntwgt => v_fntwgt,
+        p_education => v_education,
+        p_education_num => v_education_num,
+        p_marital_status => v_marital_status,
+        p_occupation => v_occupation,
+        p_relationship => v_relationship,
+        p_race => v_race,
+        p_sex => v_sex,
+        p_capital_gain => v_capital_gain,
+        p_capital_loss => v_capital_loss,
+        p_hours_per_week => v_hours_per_week,
+        p_native_country => v_native_country,
+        p_income => v_income
+    );
+
+    -- Output the fetched data
+    DBMS_OUTPUT.PUT_LINE('Id: ' || v_id);
+    DBMS_OUTPUT.PUT_LINE('Age: ' || v_age);
+    DBMS_OUTPUT.PUT_LINE('Workclass: ' || v_workclass);
+    DBMS_OUTPUT.PUT_LINE('Fntwgt: ' || v_fntwgt);
+    DBMS_OUTPUT.PUT_LINE('Education status: ' || v_education);
+    DBMS_OUTPUT.PUT_LINE('Years of education: ' || v_education_num);
+    DBMS_OUTPUT.PUT_LINE('Marital status: ' || v_marital_status);
+    DBMS_OUTPUT.PUT_LINE('Occupation: ' || v_occupation);
+    DBMS_OUTPUT.PUT_LINE('Relationship: ' || v_relationship);
+    DBMS_OUTPUT.PUT_LINE('Race: ' || v_race);
+    DBMS_OUTPUT.PUT_LINE('Sex: ' || v_sex);
+    DBMS_OUTPUT.PUT_LINE('Capital gain: ' || v_capital_gain);
+    DBMS_OUTPUT.PUT_LINE('Capital loss: ' || v_capital_loss);
+    DBMS_OUTPUT.PUT_LINE('Working hours per week: ' || v_hours_per_week);
+    DBMS_OUTPUT.PUT_LINE('Country: ' || v_native_country);
+    DBMS_OUTPUT.PUT_LINE('Income range: ' || v_income);
+
+    -- Commit the transaction
+    COMMIT;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Rollback to savepoint if no data found
+        ROLLBACK TO sp_before_select;
+        DBMS_OUTPUT.PUT_LINE('No record found with ID: ' || v_id);
+    WHEN OTHERS THEN
+        -- Rollback to savepoint in case of any other error
+        ROLLBACK TO sp_before_select;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/

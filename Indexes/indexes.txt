@@ -1,0 +1,20 @@
+EXPLAIN PLAN FOR
+SELECT * FROM adult
+WHERE income = '<=50K';
+
+-- Display the execution plan
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Create the index (if not already created)
+CREATE INDEX adult_age
+ON adult(age);
+
+-- Explain plan for the query
+EXPLAIN PLAN FOR
+SELECT * FROM adult
+WHERE income = '<=50K';
+
+-- Display the execution plan
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+DROP INDEX adult_income;

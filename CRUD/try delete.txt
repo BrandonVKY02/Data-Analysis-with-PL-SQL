@@ -1,0 +1,8 @@
+-- Prompt the user for the column name
+ACCEPT p_id NUMBER PROMPT 'Enter the id of the record to delete: '
+
+-- Execute the procedure with the user inputs
+BEGIN
+    delete_adult(&p_id);
+END;
+/

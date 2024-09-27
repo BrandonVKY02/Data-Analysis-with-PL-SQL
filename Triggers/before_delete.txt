@@ -1,0 +1,9 @@
+CREATE OR REPLACE TRIGGER before_delete_adult
+BEFORE DELETE ON adult
+FOR EACH ROW
+BEGIN
+    -- Example validation: Prevent deletion if age is less than 30
+    IF :old.age < 30 THEN
+        RAISE_APPLICATION_ERROR(-20011, 'Cannot delete record with age less than 30.');
+    END IF;
+END;

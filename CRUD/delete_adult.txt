@@ -1,0 +1,28 @@
+CREATE OR REPLACE PROCEDURE delete_adult
+  (adult_id IN NUMBER) 
+IS
+  v_rows_deleted NUMBER;
+BEGIN
+  -- Delete record from the adult table
+  DELETE FROM adult
+  WHERE id = adult_id;
+  
+  -- Get the number of rows affected by the DELETE statement
+  v_rows_deleted := SQL%ROWCOUNT;
+  
+  -- Commit the transaction
+  COMMIT;
+  
+  -- Output whether the record was deleted
+  IF v_rows_deleted > 0 THEN
+    DBMS_OUTPUT.PUT_LINE('Record with ID ' || adult_id || ' was successfully deleted.');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('No record found with ID ' || adult_id || '. No rows were deleted.');
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Rollback in case of an error
+    ROLLBACK;
+    DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+END;
+/

@@ -1,0 +1,25 @@
+DROP TABLE audit_log CASCADE CONSTRAINTS;
+
+CREATE TABLE audit_log (
+    id NUMBER PRIMARY KEY,
+    action VARCHAR2(10),
+    table_name VARCHAR2(30),
+    record_id NUMBER,
+    action_time TIMESTAMP,
+    details VARCHAR2(4000)
+);
+
+DROP SEQUENCE audit_log_seq;
+
+CREATE SEQUENCE audit_log_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE OR REPLACE TRIGGER audit_log_bi
+BEFORE INSERT ON audit_log
+FOR EACH ROW
+BEGIN
+    :NEW.id := audit_log_seq.NEXTVAL;
+END;

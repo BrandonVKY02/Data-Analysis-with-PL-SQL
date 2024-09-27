@@ -1,0 +1,32 @@
+CREATE OR REPLACE PROCEDURE create_adult (
+    p_age IN adult.age%TYPE,
+    p_workclass IN adult.workclass%TYPE,
+    p_fntwgt IN adult.fntwgt%TYPE,
+    p_education IN adult.education%TYPE,
+    p_education_num IN adult.education_num%TYPE,
+    p_marital_status IN adult.marital_status%TYPE,
+    p_occupation IN adult.occupation%TYPE,
+    p_relationship IN adult.relationship%TYPE,
+    p_race IN adult.race%TYPE,
+    p_sex IN adult.sex%TYPE,
+    p_capital_gain IN adult.capital_gain%TYPE,
+    p_capital_loss IN adult.capital_loss%TYPE,
+    p_hours_per_week IN adult.hours_per_week%TYPE,
+    p_native_country IN adult.native_country%TYPE,
+    p_income IN adult.income%TYPE,
+    p_new_id OUT adult.id%TYPE
+) IS
+BEGIN
+    INSERT INTO adult 
+	(age, workclass, fntwgt, education, education_num, marital_status, occupation, relationship, race, 
+	 sex, capital_gain, capital_loss, hours_per_week, native_country, income)
+    VALUES 
+	(p_age, p_workclass, p_fntwgt, p_education, p_education_num, p_marital_status, p_occupation, p_relationship, 
+	 p_race, p_sex, p_capital_gain, p_capital_loss, p_hours_per_week, p_native_country, p_income)
+    RETURNING id INTO p_new_id;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Record created successfully with ID: ' || p_new_id);
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;

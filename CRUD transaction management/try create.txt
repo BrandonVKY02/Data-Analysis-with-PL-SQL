@@ -1,0 +1,104 @@
+ACCEPT age NUMBER PROMPT 'Enter age: ';
+ACCEPT workclass CHAR PROMPT 'Enter workclass: ';
+ACCEPT fntwgt CHAR PROMPT 'Enter fntwgt: ';
+ACCEPT education CHAR PROMPT 'Enter education: ';
+ACCEPT education_num NUMBER PROMPT 'Enter years of education: ';
+ACCEPT marital_status_choice NUMBER PROMPT 'Enter marital status (1 for Divorced, 2 for Married, 3 for Never Married, 4 for Seperated, 5 for Widowed): ';
+ACCEPT occupation CHAR PROMPT 'Enter occupation: (or press Enter to skip inserting occupation)';
+ACCEPT relationship_choice NUMBER PROMPT 'Enter relationship (1 for Husband, 2 for Wife, 3 for Other Relative, 4 for Unmarried): ';
+ACCEPT race CHAR PROMPT 'Enter race: ';
+ACCEPT sex_choice NUMBER PROMPT 'Enter sex (1 for Male, 2 for Female): ';
+ACCEPT capital_gain NUMBER PROMPT 'Enter capital gain: ';
+ACCEPT capital_loss NUMBER PROMPT 'Enter capital loss: ';
+ACCEPT hours_per_week NUMBER PROMPT 'Enter working hours per week: ';
+ACCEPT native_country CHAR PROMPT 'Enter country: (or press Enter to skip inserting country)';
+ACCEPT income_choice NUMBER PROMPT 'Enter income range (1 for Less than or equal to 50k, 2 for More than 50k): ';
+
+DECLARE
+    v_sex VARCHAR2(30);
+    v_income VARCHAR2(30);
+    v_relationship VARCHAR2(30);
+    v_marital_status VARCHAR2(30);
+    v_new_id adult.id%TYPE;
+BEGIN
+    -- Set the values based on user input
+    v_sex := CASE &sex_choice
+                WHEN 1 THEN 'Male'
+                WHEN 2 THEN 'Female'
+                ELSE NULL
+             END;
+
+    v_income := CASE &income_choice
+                WHEN 1 THEN '<=50K'
+                WHEN 2 THEN '>50K'
+                ELSE NULL
+             END;
+
+    v_relationship := CASE &relationship_choice
+                WHEN 1 THEN 'Husband'
+                WHEN 2 THEN 'Wife'
+                WHEN 3 THEN 'Other-relative'
+                WHEN 4 THEN 'Unmarried'
+                ELSE NULL
+             END;
+
+    v_marital_status := CASE &marital_status_choice
+                WHEN 1 THEN 'Divorced'
+                WHEN 2 THEN 'Married'
+                WHEN 3 THEN 'Never-married'
+                WHEN 4 THEN 'Separated'
+                WHEN 5 THEN 'Widowed'
+                ELSE NULL
+             END;
+
+    -- Validate input values
+    IF v_sex IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for sex.');
+        RAISE_APPLICATION_ERROR(-20001, 'Invalid choice for sex.');
+    ELSIF v_income IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for income.');
+        RAISE_APPLICATION_ERROR(-20002, 'Invalid choice for income.');
+    ELSIF v_relationship IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for relationship.');
+        RAISE_APPLICATION_ERROR(-20003, 'Invalid choice for relationship.');
+    ELSIF v_marital_status IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid choice for marital status.');
+        RAISE_APPLICATION_ERROR(-20004, 'Invalid choice for marital status.');
+    ELSE
+        -- Set a savepoint
+        SAVEPOINT sp_before_insert;
+
+        BEGIN
+            -- Call the create_adult procedure
+            create_adult(
+                p_age => &age,
+                p_workclass => '&workclass',
+                p_fntwgt => '&fntwgt',
+                p_education => '&education',
+                p_education_num => &education_num,
+                p_marital_status => v_marital_status,
+                p_occupation => '&occupation',
+                p_relationship => v_relationship,
+                p_race => '&race',
+                p_sex => v_sex,
+                p_capital_gain => &capital_gain,
+                p_capital_loss => &capital_loss,
+                p_hours_per_week => &hours_per_week,
+                p_native_country => '&native_country',
+                p_income => v_income,
+                p_new_id => v_new_id
+            );
+
+            -- Commit the transaction if successful
+            COMMIT;
+            DBMS_OUTPUT.PUT_LINE('The new record ID is: ' || v_new_id);
+
+        EXCEPTION
+            WHEN OTHERS THEN
+                -- Rollback to the savepoint in case of an error
+                ROLLBACK TO sp_before_insert;
+                DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+        END;
+    END IF;
+END;
+/

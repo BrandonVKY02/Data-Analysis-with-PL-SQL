@@ -1,0 +1,120 @@
+CREATE OR REPLACE PROCEDURE select_many_adults(
+    p_column IN VARCHAR2,
+    p_value IN VARCHAR2
+) IS
+    l_sql     VARCHAR2(2000);
+    cur       SYS_REFCURSOR;
+    rec       adult%ROWTYPE;
+    row_count NUMBER := 0;
+BEGIN
+    -- Start transaction
+    SAVEPOINT sp_before_select;
+
+    -- Check if inputs are valid
+    IF p_column IS NULL OR p_value IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid input: column name and value must not be NULL.');
+        RETURN;
+    END IF;
+
+    -- Whitelist of acceptable columns (modify this list based on your actual columns)
+    IF p_column NOT IN ('id', 'age', 'workclass', 'fntwgt', 'education', 'education_num', 'marital_status', 'occupation', 
+                        'relationship', 'race', 'sex', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income') THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid column name.');
+        RETURN;
+    END IF;
+
+    l_sql := 'SELECT * FROM adult WHERE ' || p_column || ' = :value';
+
+    BEGIN
+        -- Open the cursor
+        OPEN cur FOR l_sql USING p_value;
+
+        -- Print the table header
+        DBMS_OUTPUT.PUT_LINE(
+            RPAD('ID', 5) || CHR(9) ||
+            RPAD('Age', 4) || CHR(9) ||
+            RPAD('Workclass', 20) || CHR(9) ||
+            RPAD('Fntwgt', 10) || CHR(9) ||
+            RPAD('Education', 12) || CHR(9) ||
+            RPAD('Education Year', 15) || CHR(9) ||
+            RPAD('Marital Status', 21) || CHR(9) ||
+            RPAD('Occupation', 20) || CHR(9) ||
+            RPAD('Relationship', 20) || CHR(9) ||
+            RPAD('Race', 10) || CHR(9) ||
+            RPAD('Sex', 8) || CHR(9) ||
+            RPAD('Capital Gain', 13) || CHR(9) ||
+            RPAD('Capital Loss', 13) || CHR(9) ||
+            RPAD('Hours/Week', 12) || CHR(9) ||
+            RPAD('Country', 15) || CHR(9) ||
+            RPAD('Income Range', 12)
+        );
+        DBMS_OUTPUT.PUT_LINE(
+            RPAD('-', 5, '-') || CHR(9) ||
+            RPAD('-', 4, '-') || CHR(9) ||
+            RPAD('-', 20, '-') || CHR(9) ||
+            RPAD('-', 10, '-') || CHR(9) ||
+            RPAD('-', 12, '-') || CHR(9) ||
+            RPAD('-', 15, '-') || CHR(9) ||
+            RPAD('-', 20, '-') || CHR(9) ||
+            RPAD('-', 20, '-') || CHR(9) ||
+            RPAD('-', 20, '-') || CHR(9) ||
+            RPAD('-', 10, '-') || CHR(9) ||
+            RPAD('-', 8, '-') || CHR(9) ||
+            RPAD('-', 13, '-') || CHR(9) ||
+            RPAD('-', 13, '-') || CHR(9) ||
+            RPAD('-', 12, '-') || CHR(9) ||
+            RPAD('-', 15, '-') || CHR(9) ||
+            RPAD('-', 12, '-')
+        );
+
+        -- Fetch and print each row
+        LOOP
+            FETCH cur INTO rec;
+            EXIT WHEN cur%NOTFOUND;
+            row_count := row_count + 1; -- Increment row count
+            DBMS_OUTPUT.PUT_LINE(
+                LPAD(rec.id, 5) || CHR(9) ||
+                LPAD(rec.age, 4) || CHR(9) ||
+                RPAD(SUBSTR(rec.workclass, 1, 20), 20) || CHR(9) ||
+                LPAD(rec.fntwgt, 10) || CHR(9) ||
+                RPAD(SUBSTR(rec.education, 1, 12), 12) || CHR(9) ||
+                LPAD(rec.education_num, 15) || CHR(9) ||
+                RPAD(SUBSTR(rec.marital_status, 1, 20), 20) || CHR(9) ||
+                RPAD(SUBSTR(rec.occupation, 1, 20), 20) || CHR(9) ||
+                RPAD(SUBSTR(rec.relationship, 1, 20), 20) || CHR(9) ||
+                RPAD(rec.race, 10) || CHR(9) ||
+                RPAD(rec.sex, 8) || CHR(9) ||
+                LPAD(rec.capital_gain, 13) || CHR(9) ||
+                LPAD(rec.capital_loss, 13) || CHR(9) ||
+                LPAD(rec.hours_per_week, 12) || CHR(9) ||
+                RPAD(SUBSTR(rec.native_country, 1, 15), 15) || CHR(9) ||
+                RPAD(rec.income, 12)
+            );
+        END LOOP;
+
+        -- Close the cursor
+        CLOSE cur;
+        
+        -- Output the row count
+        DBMS_OUTPUT.PUT_LINE('');
+        DBMS_OUTPUT.PUT_LINE('Total rows retrieved: ' || row_count);
+
+        -- Commit the transaction if successful
+        COMMIT;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('No data found.');
+            -- Rollback to the savepoint in case of an error
+            ROLLBACK TO sp_before_select;
+        WHEN TOO_MANY_ROWS THEN
+            DBMS_OUTPUT.PUT_LINE('Too many rows returned.');
+            -- Rollback to the savepoint in case of an error
+            ROLLBACK TO sp_before_select;
+        WHEN OTHERS THEN
+            -- Rollback to the savepoint in case of an error
+            ROLLBACK TO sp_before_select;
+            DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+    END;
+END;
+/

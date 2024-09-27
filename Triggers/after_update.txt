@@ -1,0 +1,8 @@
+CREATE OR REPLACE TRIGGER after_update_adult
+AFTER UPDATE ON adult
+FOR EACH ROW
+BEGIN
+    -- Log the update to a separate table
+    INSERT INTO audit_log (action, table_name, record_id, action_time, details)
+    VALUES ('UPDATE', 'ADULT', :new.id, SYSDATE, 'Record updated: Age=' || :new.age || ', Workclass=' || :new.workclass || ', Education=' || :new.education);
+END;

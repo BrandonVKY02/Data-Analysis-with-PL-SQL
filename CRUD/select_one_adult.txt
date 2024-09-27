@@ -1,0 +1,33 @@
+CREATE OR REPLACE PROCEDURE select_one_adult (
+    p_id IN adult.id%TYPE,
+    p_age OUT adult.age%TYPE,
+    p_workclass OUT adult.workclass%TYPE,
+    p_fntwgt OUT adult.fntwgt%TYPE,
+    p_education OUT adult.education%TYPE,
+    p_education_num OUT adult.education_num%TYPE,
+    p_marital_status OUT adult.marital_status%TYPE,
+    p_occupation OUT adult.occupation%TYPE,
+    p_relationship OUT adult.relationship%TYPE,
+    p_race OUT adult.race%TYPE,
+    p_sex OUT adult.sex%TYPE,
+    p_capital_gain OUT adult.capital_gain%TYPE,
+    p_capital_loss OUT adult.capital_loss%TYPE,
+    p_hours_per_week OUT adult.hours_per_week%TYPE,
+    p_native_country OUT adult.native_country%TYPE,
+    p_income OUT adult.income%TYPE
+) IS
+BEGIN
+    SELECT 
+	age, workclass, fntwgt, education, education_num, marital_status, occupation, relationship, 
+	race, sex, capital_gain, capital_loss, hours_per_week, native_country, income
+    INTO 
+	p_age, p_workclass, p_fntwgt, p_education, p_education_num, p_marital_status, p_occupation, 
+	p_relationship, p_race, p_sex, p_capital_gain, p_capital_loss, p_hours_per_week, p_native_country, p_income
+    FROM adult
+    WHERE id = p_id;
+
+    EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+	     DBMS_OUTPUT.PUT_LINE('No user found with ID: ' || p_id);
+	     RETURN;
+END;

@@ -1,0 +1,27 @@
+-- Prompt the user for the column name
+ACCEPT p_column CHAR PROMPT 'Enter the column name: '
+
+-- Prompt the user for the value to search for
+ACCEPT p_value CHAR PROMPT 'Enter the value to search for: '
+
+-- Execute the procedure with the user inputs
+DECLARE
+    v_column VARCHAR2(100) := '&p_column';
+    v_value  VARCHAR2(100) := '&p_value';
+BEGIN
+    -- Set a savepoint before executing the SELECT operation
+    SAVEPOINT sp_before_select;
+    
+    -- Execute the procedure to select many adults
+    select_many_adults(v_column, v_value);
+
+    -- Commit the transaction if successful
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Rollback to savepoint if an error occurs
+        ROLLBACK TO sp_before_select;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/

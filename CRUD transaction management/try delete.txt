@@ -1,0 +1,18 @@
+-- Prompt the user for the column name
+ACCEPT p_id NUMBER PROMPT 'Enter the id of the record to delete: '
+
+-- Execute the procedure with the user inputs
+BEGIN
+    -- Set a savepoint before calling the procedure
+    SAVEPOINT sp_before_procedure;
+    
+    delete_adult(&p_id);
+    
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Rollback to savepoint in case of any error
+        ROLLBACK TO sp_before_procedure;
+        DBMS_OUTPUT.PUT_LINE('Transaction failed: ' || SQLERRM);
+END;
+/
